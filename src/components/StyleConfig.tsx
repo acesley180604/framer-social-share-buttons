@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { useShareStore } from "@/store/shareStore"
 import type { StyleConfig as StyleConfigType } from "@/store/shareStore"
 
@@ -24,6 +25,13 @@ const SIZES: { id: StyleConfigType["size"]; label: string }[] = [
 export default function StyleConfig() {
     const { config, updateStyle } = useShareStore()
     const style = config.style
+
+    const handleCustomSize = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            updateStyle({ customSize: parseInt(e.target.value) || 40 })
+        },
+        [updateStyle]
+    )
 
     return (
         <div className="stack-lg">
@@ -82,7 +90,7 @@ export default function StyleConfig() {
                             min={20}
                             max={80}
                             value={style.customSize}
-                            onChange={(e) => updateStyle({ customSize: parseInt(e.target.value) || 40 })}
+                            onChange={handleCustomSize}
                         />
                     </div>
                 )}

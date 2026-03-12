@@ -6,6 +6,7 @@ const LAYOUT_MODES: { id: LayoutConfigType["mode"]; label: string; desc: string 
     { id: "vertical", label: "Vertical", desc: "Buttons stacked" },
     { id: "floating", label: "Floating", desc: "Fixed sidebar" },
     { id: "inline", label: "Inline", desc: "Inline with text" },
+    { id: "fly-in", label: "Fly-in", desc: "Slides up from corner (Monarch-style)" },
 ]
 
 export default function LayoutConfig() {
@@ -107,6 +108,100 @@ export default function LayoutConfig() {
                                 />
                             </div>
                         </div>
+                    </section>
+                </>
+            )}
+
+            {/* Fly-in specific options */}
+            {layout.mode === "fly-in" && (
+                <>
+                    <hr />
+                    <section className="stack-sm">
+                        <label>Fly-in Position</label>
+                        <div className="segment-group">
+                            <button
+                                onClick={() => updateLayout({ flyInPosition: "bottom-left" })}
+                                className={`segment-btn ${layout.flyInPosition === "bottom-left" ? "active" : ""}`}
+                            >
+                                Bottom Left
+                            </button>
+                            <button
+                                onClick={() => updateLayout({ flyInPosition: "bottom-right" })}
+                                className={`segment-btn ${layout.flyInPosition === "bottom-right" ? "active" : ""}`}
+                            >
+                                Bottom Right
+                            </button>
+                        </div>
+                    </section>
+
+                    <section className="stack-sm">
+                        <label>Trigger</label>
+                        <div className="segment-group">
+                            <button
+                                onClick={() => updateLayout({ flyInTrigger: "scroll" })}
+                                className={`segment-btn ${layout.flyInTrigger === "scroll" ? "active" : ""}`}
+                            >
+                                Scroll %
+                            </button>
+                            <button
+                                onClick={() => updateLayout({ flyInTrigger: "time" })}
+                                className={`segment-btn ${layout.flyInTrigger === "time" ? "active" : ""}`}
+                            >
+                                Time Delay
+                            </button>
+                        </div>
+                    </section>
+
+                    {layout.flyInTrigger === "scroll" ? (
+                        <section className="stack-sm">
+                            <div className="row-between">
+                                <label style={{ margin: 0 }}>Scroll threshold</label>
+                                <span style={{ fontSize: 10, color: "var(--framer-color-text-tertiary)" }}>
+                                    {layout.flyInScrollPercent}%
+                                </span>
+                            </div>
+                            <input
+                                type="range"
+                                min={10}
+                                max={90}
+                                step={5}
+                                value={layout.flyInScrollPercent}
+                                onChange={(e) =>
+                                    updateLayout({ flyInScrollPercent: parseInt(e.target.value) })
+                                }
+                            />
+                        </section>
+                    ) : (
+                        <section className="stack-sm">
+                            <div className="row-between">
+                                <label style={{ margin: 0 }}>Time delay</label>
+                                <span style={{ fontSize: 10, color: "var(--framer-color-text-tertiary)" }}>
+                                    {layout.flyInTimeDelay}s
+                                </span>
+                            </div>
+                            <input
+                                type="range"
+                                min={1}
+                                max={30}
+                                value={layout.flyInTimeDelay}
+                                onChange={(e) =>
+                                    updateLayout({ flyInTimeDelay: parseInt(e.target.value) })
+                                }
+                            />
+                        </section>
+                    )}
+
+                    <section className="stack-sm">
+                        <div className="row-between">
+                            <label style={{ margin: 0 }}>Dismissable</label>
+                            <div
+                                className={`toggle ${layout.flyInDismissable ? "on" : ""}`}
+                                onClick={() => updateLayout({ flyInDismissable: !layout.flyInDismissable })}
+                            >
+                                <div className="toggle-knob" />
+                            </div>
+                        </div>
+                        <p>Allow visitors to close the fly-in box.</p>
                     </section>
                 </>
             )}

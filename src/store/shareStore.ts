@@ -20,11 +20,17 @@ export interface StyleConfig {
 }
 
 export interface LayoutConfig {
-    mode: "horizontal" | "vertical" | "floating" | "inline"
+    mode: "horizontal" | "vertical" | "floating" | "inline" | "fly-in"
     spacing: number
     floatingPosition: "left" | "right"
     floatingOffsetX: number
     floatingOffsetY: number
+    /** Fly-in specific */
+    flyInPosition: "bottom-left" | "bottom-right"
+    flyInTrigger: "scroll" | "time"
+    flyInScrollPercent: number
+    flyInTimeDelay: number
+    flyInDismissable: boolean
 }
 
 export interface ShareTextConfig {
@@ -43,11 +49,74 @@ export interface ShareAnalyticsEvent {
     url: string
     timestamp: number
     page: string
+    device?: string
+    referrer?: string
 }
 
 export interface AnalyticsConfig {
     enabled: boolean
     events: ShareAnalyticsEvent[]
+}
+
+export interface FollowProfile {
+    platformId: string
+    handle: string
+    followerCount: string
+    enabled: boolean
+}
+
+export interface FollowConfig {
+    profiles: FollowProfile[]
+    buttonStyle: "icon-only" | "icon-text" | "text-only"
+    buttonShape: "square" | "rounded" | "circle" | "pill"
+    size: "small" | "medium" | "large"
+    showCounts: boolean
+    useUnifiedColor: boolean
+    unifiedColor: string
+}
+
+export interface ImageSharingConfig {
+    enabled: boolean
+    platforms: string[]
+    minImageWidth: number
+    minImageHeight: number
+    position: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center"
+}
+
+export interface ClickToTweetConfig {
+    text: string
+    viaHandle: string
+    hashtags: string
+    style: "minimal" | "bordered" | "gradient" | "dark"
+}
+
+export interface ContentLockerConfig {
+    enabled: boolean
+    message: string
+    platforms: string[]
+    blurContent: boolean
+    lockedContentId: string
+}
+
+export interface ShareCountConfig {
+    enabled: boolean
+    facebookAppId: string
+    cacheTTLMinutes: number
+}
+
+export interface OGConfig {
+    ogTitle: string
+    ogDescription: string
+    ogImage: string
+    ogUrl: string
+    ogType: string
+    ogSiteName: string
+    twitterCard: "summary" | "summary_large_image"
+    twitterTitle: string
+    twitterDescription: string
+    twitterImage: string
+    twitterSite: string
+    twitterCreator: string
 }
 
 export interface ShareConfig {
@@ -58,6 +127,12 @@ export interface ShareConfig {
     animation: AnimationConfig
     showCounts: boolean
     analytics: AnalyticsConfig
+    follow: FollowConfig
+    imageSharing: ImageSharingConfig
+    clickToTweets: ClickToTweetConfig[]
+    contentLocker: ContentLockerConfig
+    shareCountConfig: ShareCountConfig
+    og: OGConfig
 }
 
 // ── Store ───────────────────────────────────────────────────────────────────
@@ -79,6 +154,29 @@ interface ShareState {
     toggleAnalytics: (enabled: boolean) => void
     addAnalyticsEvent: (event: ShareAnalyticsEvent) => void
     clearAnalytics: () => void
+
+    // Follow
+    updateFollow: (updates: Partial<FollowConfig>) => void
+    updateFollowProfile: (platformId: string, updates: Partial<FollowProfile>) => void
+    addFollowProfile: (profile: FollowProfile) => void
+    removeFollowProfile: (platformId: string) => void
+
+    // Image Sharing
+    updateImageSharing: (updates: Partial<ImageSharingConfig>) => void
+
+    // Click to Tweet
+    addClickToTweet: (tweet: ClickToTweetConfig) => void
+    updateClickToTweet: (index: number, updates: Partial<ClickToTweetConfig>) => void
+    removeClickToTweet: (index: number) => void
+
+    // Content Locker
+    updateContentLocker: (updates: Partial<ContentLockerConfig>) => void
+
+    // Share Counts
+    updateShareCountConfig: (updates: Partial<ShareCountConfig>) => void
+
+    // OG Tags
+    updateOG: (updates: Partial<OGConfig>) => void
 
     // Misc
     resetConfig: () => void
@@ -165,6 +263,98 @@ export const useShareStore = create<ShareState>((set) => ({
                 ...state.config,
                 analytics: { ...state.config.analytics, events: [] },
             },
+        })),
+
+    // Follow
+    updateFollow: (updates) =>
+        set((state) => ({
+            config: { ...state.config, follow: { ...state.config.follow, ...updates } },
+        })),
+
+    updateFollowProfile: (platformId, updates) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                follow: {
+                    ...state.config.follow,
+                    profiles: state.config.follow.profiles.map((p) =>
+                        p.platformId === platformId ? { ...p, ...updates } : p
+                    ),
+                },
+            },
+        })),
+
+    addFollowProfile: (profile) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                follow: {
+                    ...state.config.follow,
+                    profiles: [...state.config.follow.profiles, profile],
+                },
+            },
+        })),
+
+    removeFollowProfile: (platformId) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                follow: {
+                    ...state.config.follow,
+                    profiles: state.config.follow.profiles.filter((p) => p.platformId !== platformId),
+                },
+            },
+        })),
+
+    // Image Sharing
+    updateImageSharing: (updates) =>
+        set((state) => ({
+            config: { ...state.config, imageSharing: { ...state.config.imageSharing, ...updates } },
+        })),
+
+    // Click to Tweet
+    addClickToTweet: (tweet) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                clickToTweets: [...state.config.clickToTweets, tweet],
+            },
+        })),
+
+    updateClickToTweet: (index, updates) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                clickToTweets: state.config.clickToTweets.map((t, i) =>
+                    i === index ? { ...t, ...updates } : t
+                ),
+            },
+        })),
+
+    removeClickToTweet: (index) =>
+        set((state) => ({
+            config: {
+                ...state.config,
+                clickToTweets: state.config.clickToTweets.filter((_, i) => i !== index),
+            },
+        })),
+
+    // Content Locker
+    updateContentLocker: (updates) =>
+        set((state) => ({
+            config: { ...state.config, contentLocker: { ...state.config.contentLocker, ...updates } },
+        })),
+
+    // Share Counts
+    updateShareCountConfig: (updates) =>
+        set((state) => ({
+            config: { ...state.config, shareCountConfig: { ...state.config.shareCountConfig, ...updates } },
+        })),
+
+    // OG Tags
+    updateOG: (updates) =>
+        set((state) => ({
+            config: { ...state.config, og: { ...state.config.og, ...updates } },
         })),
 
     resetConfig: () => set({ config: { ...DEFAULT_SHARE_CONFIG } }),

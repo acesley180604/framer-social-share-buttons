@@ -1,5 +1,6 @@
 {
-  "id": "social-share-buttons",
+  "id": "590824",
   "name": "Social Share Buttons",
-  "modes": ["canvas"]
+  "modes": ["canvas"],
+  "icon": "/icon.svg"
 }

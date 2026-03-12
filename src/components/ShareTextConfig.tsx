@@ -57,58 +57,6 @@ export default function ShareTextConfig() {
 
             <hr />
 
-            {/* OG Preview */}
-            <section className="stack-sm">
-                <h2>Open Graph Preview</h2>
-                <p>How your page will appear when shared on social media.</p>
-
-                <div className="preview-container">
-                    <div className="preview-header">og:preview</div>
-                    <div style={{ padding: 12, background: "var(--framer-color-bg-secondary)" }}>
-                        <div
-                            style={{
-                                background: "#f0f0f0",
-                                borderRadius: 6,
-                                padding: 12,
-                                border: "1px solid #ddd",
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: "100%",
-                                    height: 80,
-                                    background: "#ccc",
-                                    borderRadius: 4,
-                                    marginBottom: 8,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: 10,
-                                    color: "#888",
-                                }}
-                            >
-                                og:image
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#333",
-                                    marginBottom: 4,
-                                }}
-                            >
-                                {shareText.customText || "Page Title (from meta tags)"}
-                            </div>
-                            <div style={{ fontSize: 10, color: "#666" }}>
-                                {shareText.customUrl || "https://yoursite.com/page"}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <hr />
-
             {/* Show counts toggle */}
             <section className="stack-sm">
                 <div className="row-between">
