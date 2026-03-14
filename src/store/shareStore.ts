@@ -102,6 +102,20 @@ export interface ShareCountConfig {
     enabled: boolean
     facebookAppId: string
     cacheTTLMinutes: number
+    minShareCount: number
+}
+
+export interface UTMConfig {
+    enabled: boolean
+    source: "auto" | string
+    medium: string
+    campaign: string
+}
+
+export interface PinterestOverlayConfig {
+    enabled: boolean
+    platforms: string[]
+    position: "top-left" | "top-right" | "bottom-left" | "bottom-right"
 }
 
 export interface OGConfig {
@@ -133,6 +147,8 @@ export interface ShareConfig {
     contentLocker: ContentLockerConfig
     shareCountConfig: ShareCountConfig
     og: OGConfig
+    utm: UTMConfig
+    pinterestOverlay: PinterestOverlayConfig
 }
 
 // ── Store ───────────────────────────────────────────────────────────────────
@@ -177,6 +193,12 @@ interface ShareState {
 
     // OG Tags
     updateOG: (updates: Partial<OGConfig>) => void
+
+    // UTM
+    updateUTM: (updates: Partial<UTMConfig>) => void
+
+    // Pinterest Overlay
+    updatePinterestOverlay: (updates: Partial<PinterestOverlayConfig>) => void
 
     // Misc
     resetConfig: () => void
@@ -355,6 +377,18 @@ export const useShareStore = create<ShareState>((set) => ({
     updateOG: (updates) =>
         set((state) => ({
             config: { ...state.config, og: { ...state.config.og, ...updates } },
+        })),
+
+    // UTM
+    updateUTM: (updates) =>
+        set((state) => ({
+            config: { ...state.config, utm: { ...state.config.utm, ...updates } },
+        })),
+
+    // Pinterest Overlay
+    updatePinterestOverlay: (updates) =>
+        set((state) => ({
+            config: { ...state.config, pinterestOverlay: { ...state.config.pinterestOverlay, ...updates } },
         })),
 
     resetConfig: () => set({ config: { ...DEFAULT_SHARE_CONFIG } }),

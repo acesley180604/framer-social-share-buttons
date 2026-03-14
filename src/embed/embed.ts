@@ -4,6 +4,13 @@
  * Features: configurable share buttons for 9 platforms with animations.
  */
 
+interface UTMDef {
+    enabled: boolean
+    source: string
+    medium: string
+    campaign: string
+}
+
 interface SsbConfig {
     platforms: PlatformEntry[]
     style: StyleDef
@@ -12,6 +19,8 @@ interface SsbConfig {
     animation: AnimDef
     showCounts: boolean
     analytics: AnalyticsDef
+    utm?: UTMDef
+    shareCountConfig?: { minShareCount?: number }
 }
 
 interface PlatformEntry {
@@ -171,6 +180,22 @@ interface AnalyticsDef {
         }
         document.body.removeChild(ta)
         return ok
+    }
+
+    // ── UTM helper ─────────────────────────────────────────────────────────
+
+    function appendUTM(url: string, utm: UTMDef | undefined, platformId: string): string {
+        if (!utm || !utm.enabled) return url
+        const sep = url.includes("?") ? "&" : "?"
+        const source = utm.source === "auto" ? platformId : utm.source
+        const params = [
+            source ? "utm_source=" + encodeURIComponent(source) : "",
+            utm.medium ? "utm_medium=" + encodeURIComponent(utm.medium) : "",
+            utm.campaign ? "utm_campaign=" + encodeURIComponent(utm.campaign) : "",
+        ]
+            .filter(Boolean)
+            .join("&")
+        return params ? url + sep + params : url
     }
 
     // ── Analytics tracking ──────────────────────────────────────────────────
@@ -378,9 +403,12 @@ interface AnalyticsDef {
             btn.onclick = (e) => {
                 e.preventDefault()
 
+                // Apply UTM to the page URL for sharing
+                const sharePageUrl = appendUTM(pageUrl, cfg.utm, pid)
+
                 // Copy Link
                 if (pid === "copy") {
-                    copyToClipboard(pageUrl).then((ok) => {
+                    copyToClipboard(sharePageUrl).then((ok) => {
                         if (ok) {
                             const origHTML = btn.innerHTML
                             if (isTextOnly) {
@@ -393,7 +421,7 @@ interface AnalyticsDef {
                             }, 1500)
                         }
                     })
-                    trackShare(cfg, pid, pageUrl)
+                    trackShare(cfg, pid, sharePageUrl)
                     return
                 }
 
@@ -402,7 +430,7 @@ interface AnalyticsDef {
                 if (!tmpl) return
 
                 const url = tmpl
-                    .replace("{url}", encodeURIComponent(pageUrl))
+                    .replace("{url}", encodeURIComponent(sharePageUrl))
                     .replace("{text}", encodeURIComponent(pageText))
 
                 if (pid === "email") {
@@ -415,7 +443,7 @@ interface AnalyticsDef {
                     )
                 }
 
-                trackShare(cfg, pid, pageUrl)
+                trackShare(cfg, pid, sharePageUrl)
             }
 
             container.appendChild(btn)

@@ -247,6 +247,24 @@ export function getPlatformById(id: string): PlatformConfig | undefined {
     return PLATFORMS.find((p) => p.id === id)
 }
 
+export function appendUTMParams(
+    url: string,
+    utm: { enabled: boolean; source: string; medium: string; campaign: string },
+    platformId?: string
+): string {
+    if (!utm.enabled) return url
+    const separator = url.includes("?") ? "&" : "?"
+    const source = utm.source === "auto" && platformId ? platformId : utm.source
+    const params = [
+        source ? `utm_source=${encodeURIComponent(source)}` : "",
+        utm.medium ? `utm_medium=${encodeURIComponent(utm.medium)}` : "",
+        utm.campaign ? `utm_campaign=${encodeURIComponent(utm.campaign)}` : "",
+    ]
+        .filter(Boolean)
+        .join("&")
+    return params ? `${url}${separator}${params}` : url
+}
+
 export function buildShareUrl(template: string, url: string, text: string): string {
     return template
         .replace("{url}", encodeURIComponent(url))

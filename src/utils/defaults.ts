@@ -88,6 +88,7 @@ export const DEFAULT_SHARE_CONFIG: ShareConfig = {
         enabled: false,
         facebookAppId: "",
         cacheTTLMinutes: 60,
+        minShareCount: 0,
     },
     og: {
         ogTitle: "",
@@ -102,5 +103,16 @@ export const DEFAULT_SHARE_CONFIG: ShareConfig = {
         twitterImage: "",
         twitterSite: "",
         twitterCreator: "",
+    },
+    utm: {
+        enabled: false,
+        source: "auto",
+        medium: "social",
+        campaign: "",
+    },
+    pinterestOverlay: {
+        enabled: false,
+        platforms: ["pinterest"],
+        position: "top-right",
     },
 }
