@@ -253,7 +253,18 @@ export function appendUTMParams(
     platformId?: string
 ): string {
     if (!utm.enabled) return url
-    const separator = url.includes("?") ? "&" : "?"
+    // Strip existing utm_ params first to avoid duplicates
+    let cleanUrl = url
+    try {
+        const u = new URL(url, window.location.origin)
+        u.searchParams.delete("utm_source")
+        u.searchParams.delete("utm_medium")
+        u.searchParams.delete("utm_campaign")
+        cleanUrl = u.toString()
+    } catch {
+        // If URL parsing fails, fall through with original
+    }
+    const separator = cleanUrl.includes("?") ? "&" : "?"
     const source = utm.source === "auto" && platformId ? platformId : utm.source
     const params = [
         source ? `utm_source=${encodeURIComponent(source)}` : "",
@@ -262,7 +273,7 @@ export function appendUTMParams(
     ]
         .filter(Boolean)
         .join("&")
-    return params ? `${url}${separator}${params}` : url
+    return params ? `${cleanUrl}${separator}${params}` : cleanUrl
 }
 
 export function buildShareUrl(template: string, url: string, text: string): string {

@@ -186,7 +186,18 @@ interface AnalyticsDef {
 
     function appendUTM(url: string, utm: UTMDef | undefined, platformId: string): string {
         if (!utm || !utm.enabled) return url
-        const sep = url.includes("?") ? "&" : "?"
+        // Strip existing UTM params to avoid duplicates
+        let cleanUrl = url
+        try {
+            const u = new URL(url, window.location.origin)
+            u.searchParams.delete("utm_source")
+            u.searchParams.delete("utm_medium")
+            u.searchParams.delete("utm_campaign")
+            cleanUrl = u.toString()
+        } catch {
+            // If URL parsing fails, fall through with original
+        }
+        const sep = cleanUrl.includes("?") ? "&" : "?"
         const source = utm.source === "auto" ? platformId : utm.source
         const params = [
             source ? "utm_source=" + encodeURIComponent(source) : "",
@@ -195,7 +206,7 @@ interface AnalyticsDef {
         ]
             .filter(Boolean)
             .join("&")
-        return params ? url + sep + params : url
+        return params ? cleanUrl + sep + params : cleanUrl
     }
 
     // ── Analytics tracking ──────────────────────────────────────────────────
