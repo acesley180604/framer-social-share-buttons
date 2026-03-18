@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react"
+import { LicenseGate } from "@shared/index"
 import { motion, AnimatePresence } from "motion/react"
 import { useShareStore } from "./store/shareStore"
 import PlatformSelector from "./components/PlatformSelector"
@@ -87,6 +88,7 @@ export default function App() {
     }, [activeTab])
 
     return (
+        <LicenseGate pluginSlug="social-share-buttons">
         <section>
             <header className="row-between" style={{ padding: "12px 15px", borderBottom: "1px solid var(--framer-color-divider)" }}>
                 <div className="row gap-8">
@@ -138,5 +140,6 @@ export default function App() {
             </AnimatePresence>
             <footer>Free plan active. Upgrade: Starter $9/mo | Pro $19/mo | Agency $39/mo</footer>
         </section>
+        </LicenseGate>
     )
 }
